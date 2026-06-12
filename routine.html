@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ルーティン">
+<meta name="theme-color" content="#1D9E75">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231D9E75'/%3E%3Ctext x='90' y='118' font-size='90' text-anchor='middle' font-family='-apple-system'%3E📅%3C/text%3E%3C/svg%3E">
+<title>平日ルーティン</title>
+<style>
+:root {
+  --teal: #1D9E75; --teal-bg: #E1F5EE; --teal-border: #9FE1CB; --teal-text: #085041;
+  --amber: #EF9F27; --amber-bg: #FAEEDA; --amber-border: #FAC775; --amber-text: #633806;
+  --purple: #7F77DD; --purple-bg: #EEEDFE; --purple-border: #CECBF6; --purple-text: #3C3489;
+  --blue: #378ADD; --blue-bg: #E6F1FB; --blue-border: #B5D4F4; --blue-text: #0C447C;
+  --coral-bg: #FAECE7; --coral-border: #F5C4B3; --coral-text: #712B13;
+  --line: #e0e0e0;
+  --text: #1a1a1a; --text2: #555; --text3: #999;
+  --bg: #f7f7f5; --card: #fff;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+.header {
+  background: var(--card);
+  border-bottom: 0.5px solid var(--line);
+  padding: calc(var(--safe-top) + 14px) 16px 14px;
+  position: sticky; top: 0; z-index: 10;
+}
+.header-title { font-size: 17px; font-weight: 600; text-align: center; }
+.header-sub { font-size: 12px; color: var(--text3); text-align: center; margin-top: 2px; }
+
+.week-bar {
+  display: flex; gap: 6px; padding: 12px 12px 0;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.week-bar::-webkit-scrollbar { display: none; }
+.day-btn {
+  flex: 0 0 auto; min-width: 62px;
+  border-radius: 10px; padding: 8px 6px; text-align: center;
+  border: 1px solid var(--line); background: var(--card);
+  cursor: pointer; transition: all .15s;
+}
+.day-btn.walk { background: var(--teal-bg); border-color: var(--teal-border); }
+.day-btn.study { background: var(--amber-bg); border-color: var(--amber-border); }
+.day-btn.active { outline: 2.5px solid var(--blue); outline-offset: 1px; }
+.day-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.day-type { font-size: 10px; margin-top: 2px; line-height: 1.3; }
+.day-btn.walk .day-type { color: var(--teal-text); }
+.day-btn.study .day-type { color: var(--amber-text); }
+
+.legend { display: flex; gap: 12px; padding: 10px 12px 4px; flex-wrap: wrap; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
+.leg-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+.panel { display: none; padding: 12px 12px calc(var(--safe-bottom) + 24px); }
+.panel.active { display: block; }
+
+.sec-label {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  letter-spacing: .08em; text-transform: uppercase;
+  margin: 14px 0 8px 48px;
+}
+
+.tl { position: relative; padding-left: 48px; }
+.tl::before { content: ''; position: absolute; left: 32px; top: 0; bottom: 0; width: 1px; background: var(--line); }
+.ti { position: relative; margin-bottom: 4px; }
+.ttime {
+  position: absolute; left: -48px; width: 40px;
+  font-size: 10px; color: var(--text3); text-align: right;
+  padding-top: 11px; white-space: nowrap; line-height: 1.2;
+}
+.tdot {
+  position: absolute; left: -17px; top: 11px;
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 1.5px solid #ccc; background: var(--card); z-index: 1;
+}
+.tdot.teal { background: var(--teal); border-color: var(--teal); }
+.tdot.amber { background: var(--amber); border-color: var(--amber); }
+.tdot.purple { background: var(--purple); border-color: var(--purple); }
+.tdot.blue { background: var(--blue); border-color: var(--blue); }
+.tdot.coral { background: #D85A30; border-color: #D85A30; }
+
+.tc {
+  background: var(--card); border: 0.5px solid var(--line);
+  border-radius: 10px; padding: 9px 11px; margin-bottom: 4px;
+}
+.tc.teal { background: var(--teal-bg); border-color: var(--teal-border); }
+.tc.amber { background: var(--amber-bg); border-color: var(--amber-border); }
+.tc.purple { background: var(--purple-bg); border-color: var(--purple-border); }
+.tc.blue { background: var(--blue-bg); border-color: var(--blue-border); }
+.tc.coral { background: var(--coral-bg); border-color: var(--coral-border); }
+.tc.gray { background: #f1f0ec; border-color: #e0e0e0; }
+
+.tt { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tc.teal .tt { color: var(--teal-text); }
+.tc.amber .tt { color: var(--amber-text); }
+.tc.purple .tt { color: var(--purple-text); }
+.tc.blue .tt { color: var(--blue-text); }
+.tc.coral .tt { color: var(--coral-text); }
+.tc.gray .tt { color: var(--text2); }
+
+.ts { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+.tc.teal .ts { color: #0F6E56; }
+.tc.amber .ts { color: #854F0B; }
+.tc.coral .ts { color: #993C1D; }
+
+.bdg { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+.bdg-teal { background: var(--teal-border); color: var(--teal-text); }
+.bdg-amber { background: var(--amber-border); color: var(--amber-text); }
+.bdg-purple { background: var(--purple-border); color: var(--purple-text); }
+.bdg-blue { background: var(--blue-border); color: var(--blue-text); }
+.bdg-coral { background: var(--coral-border); color: var(--coral-text); }
+
+.water { font-size: 11px; color: #185FA5; padding: 5px 0; display: flex; align-items: center; gap: 4px; }
+
+.rules {
+  background: var(--card); border: 0.5px solid var(--line);
+  border-radius: 12px; padding: 12px 14px; margin-top: 12px;
+}
+.rt { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.ri { font-size: 11px; color: var(--text2); padding: 5px 0; border-bottom: 0.5px solid var(--line); display: flex; gap: 6px; line-height: 1.5; }
+.ri:last-child { border-bottom: none; }
+.rn { font-weight: 700; color: var(--blue); min-width: 14px; }
+
+.planb-note {
+  background: var(--coral-bg); border: 0.5px solid var(--coral-border);
+  border-radius: 10px; padding: 9px 11px; margin-bottom: 10px;
+}
+.planb-note .pt { font-size: 12px; font-weight: 600; color: var(--coral-text); }
+.planb-note .ps { font-size: 11px; color: #993C1D; margin-top: 3px; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">平日ルーティン</div>
+  <div class="header-sub">曜日をタップして切り替え</div>
+</div>
+
+<div class="week-bar">
+  <div class="day-btn study active" onclick="show('mon')" id="pill-mon">
+    <div class="day-name">月</div>
+    <div class="day-type">筋トレ<br>+勉強</div>
+  </div>
+  <div class="day-btn study" onclick="show('tue')" id="pill-tue">
+    <div class="day-name">火</div>
+    <div class="day-type">筋トレ<br>+勉強</div>
+  </div>
+  <div class="day-btn walk" onclick="show('wed')" id="pill-wed">
+    <div class="day-name">水</div>
+    <div class="day-type">ウォーキング</div>
+  </div>
+  <div class="day-btn study" onclick="show('thu')" id="pill-thu">
+    <div class="day-name">木</div>
+    <div class="day-type">筋トレ<br>+勉強</div>
+  </div>
+  <div class="day-btn study" onclick="show('fri')" id="pill-fri">
+    <div class="day-name">金</div>
+    <div class="day-type">筋トレ<br>+勉強</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--teal)"></div>筋トレ+勉強日</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--teal-border);border:1px solid var(--teal)"></div>ウォーキング日</div>
+</div>
+
+<!-- 月・火・木・金 共通テンプレート -->
+<div class="panel active" id="panel-mon">
+  <div class="sec-label">朝</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床・朝筋トレ 20分 <span class="bdg bdg-teal">朝</span></div><div class="ts">Pendulum で集中スタート</div></div></div>
+    <div class="ti"><span class="ttime">〜</span><div class="tdot"></div><div class="tc gray"><div class="tt">日中（仕事）</div></div></div>
+  </div>
+  <div class="sec-label">夜</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">19:30</span><div class="tdot blue"></div><div class="tc blue"><div class="tt">夕食 <span class="bdg bdg-blue">20:00までに完了</span></div></div></div>
+    <div class="ti"><span class="ttime">20:00</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">夜筋トレ 30分 <span class="bdg bdg-teal">夜</span></div><div class="ts">食後すぐ動いてストレス食いの隙間を潰す</div></div></div>
+    <div class="ti"><span class="ttime">20:30</span><div class="tdot"></div><div class="tc"><div class="tt">休息・風呂待ち 約20分</div><div class="ts">Claudeへ一言 → 対話でスイッチ保持</div></div></div>
+    <div class="ti"><span class="ttime">20:50</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">21:00</span><div class="tdot"></div><div class="tc"><div class="tt">お風呂＆ケア 30分</div><div class="ts">深部体温を上げる</div></div></div>
+    <div class="ti"><span class="ttime">21:30</span><div class="tdot amber"></div><div class="tc amber"><div class="tt">勉強 60分 <span class="bdg bdg-amber">コア枠</span></div><div class="ts">haruka nakamura で集中 / AI secretary・Claude Codeなど</div></div></div>
+    <div class="ti"><span class="ttime">22:10</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">22:30</span><div class="tdot purple"></div><div class="tc purple"><div class="tt">就寝 <span class="bdg bdg-purple">6時間確保</span></div></div></div>
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床</div></div></div>
+  </div>
+  <div class="rules">
+    <div class="rt">ポイント</div>
+    <div class="ri"><span class="rn">1</span>夕食→即筋トレ。ストレス食いの時間を物理的に消す</div>
+    <div class="ri"><span class="rn">2</span>風呂待ちはClaude対話。グダグダの入口を塞ぐ</div>
+    <div class="ri"><span class="rn">3</span>勉強が乗っても22:30で切る。睡眠は死守</div>
+  </div>
+</div>
+
+<div class="panel" id="panel-tue">
+  <div class="sec-label">朝</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床・朝筋トレ 20分 <span class="bdg bdg-teal">朝</span></div><div class="ts">Pendulum で集中スタート</div></div></div>
+    <div class="ti"><span class="ttime">〜</span><div class="tdot"></div><div class="tc gray"><div class="tt">日中（仕事）</div></div></div>
+  </div>
+  <div class="sec-label">夜</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">19:30</span><div class="tdot blue"></div><div class="tc blue"><div class="tt">夕食 <span class="bdg bdg-blue">20:00までに完了</span></div></div></div>
+    <div class="ti"><span class="ttime">20:00</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">夜筋トレ 30分 <span class="bdg bdg-teal">夜</span></div><div class="ts">食後すぐ動いてストレス食いの隙間を潰す</div></div></div>
+    <div class="ti"><span class="ttime">20:30</span><div class="tdot"></div><div class="tc"><div class="tt">休息・風呂待ち 約20分</div><div class="ts">Claudeへ一言 → 対話でスイッチ保持</div></div></div>
+    <div class="ti"><span class="ttime">20:50</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">21:00</span><div class="tdot"></div><div class="tc"><div class="tt">お風呂＆ケア 30分</div></div></div>
+    <div class="ti"><span class="ttime">21:30</span><div class="tdot amber"></div><div class="tc amber"><div class="tt">勉強 60分 <span class="bdg bdg-amber">コア枠</span></div><div class="ts">haruka nakamura で集中</div></div></div>
+    <div class="ti"><span class="ttime">22:10</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">22:30</span><div class="tdot purple"></div><div class="tc purple"><div class="tt">就寝 <span class="bdg bdg-purple">6時間確保</span></div></div></div>
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床</div></div></div>
+  </div>
+  <div class="rules">
+    <div class="rt">ポイント</div>
+    <div class="ri"><span class="rn">1</span>夕食→即筋トレ。ストレス食いの時間を物理的に消す</div>
+    <div class="ri"><span class="rn">2</span>風呂待ちはClaude対話。グダグダの入口を塞ぐ</div>
+    <div class="ri"><span class="rn">3</span>勉強が乗っても22:30で切る。睡眠は死守</div>
+  </div>
+</div>
+
+<div class="panel" id="panel-wed">
+  <div class="planb-note">
+    <div class="pt">帰宅遅め（プランB）の場合</div>
+    <div class="ps">20:00超えたらウォーキング即中止。筋トレ→風呂→22:30就寝を死守</div>
+  </div>
+  <div class="sec-label">朝</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床・朝筋トレ 20分 <span class="bdg bdg-teal">朝</span></div></div></div>
+    <div class="ti"><span class="ttime">〜</span><div class="tdot"></div><div class="tc gray"><div class="tt">日中（仕事）</div></div></div>
+  </div>
+  <div class="sec-label">夜（プランA — ウォーキングあり）</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">19:30</span><div class="tdot blue"></div><div class="tc blue"><div class="tt">夕食 <span class="bdg bdg-blue">20:00までに完了</span></div></div></div>
+    <div class="ti"><span class="ttime">20:00</span><div class="tdot"></div><div class="tc"><div class="tt">休息 60分</div><div class="ts">胃腸を休める</div></div></div>
+    <div class="ti"><span class="ttime">20:55</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">21:00</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">ウォーキング 30分 <span class="bdg bdg-teal">散歩</span></div><div class="ts">ゆったりペース。脳のストレスを散らす</div></div></div>
+    <div class="ti"><span class="ttime">21:30</span><div class="tdot"></div><div class="tc"><div class="tt">お風呂＆ケア 40分</div></div></div>
+    <div class="ti"><span class="ttime">22:10</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">22:30</span><div class="tdot purple"></div><div class="tc purple"><div class="tt">就寝 <span class="bdg bdg-purple">6時間確保</span></div></div></div>
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床</div></div></div>
+  </div>
+  <div class="rules">
+    <div class="rt">ウォーキング日の鉄則</div>
+    <div class="ri"><span class="rn">1</span>20:00が決行デッドライン。超えたら即プランB</div>
+    <div class="ri"><span class="rn">2</span>平日ウォーキングは脱力目的。飛ばさない</div>
+    <div class="ri"><span class="rn">3</span>歩けない日も22:30就寝は絶対ズラさない</div>
+  </div>
+</div>
+
+<div class="panel" id="panel-thu">
+  <div class="sec-label">朝</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床・朝筋トレ 20分 <span class="bdg bdg-teal">朝</span></div><div class="ts">Pendulum で集中スタート</div></div></div>
+    <div class="ti"><span class="ttime">〜</span><div class="tdot"></div><div class="tc gray"><div class="tt">日中（仕事）</div></div></div>
+  </div>
+  <div class="sec-label">夜</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">19:30</span><div class="tdot blue"></div><div class="tc blue"><div class="tt">夕食 <span class="bdg bdg-blue">20:00までに完了</span></div></div></div>
+    <div class="ti"><span class="ttime">20:00</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">夜筋トレ 30分 <span class="bdg bdg-teal">夜</span></div><div class="ts">食後すぐ動いてストレス食いの隙間を潰す</div></div></div>
+    <div class="ti"><span class="ttime">20:30</span><div class="tdot"></div><div class="tc"><div class="tt">休息・風呂待ち 約20分</div><div class="ts">Claudeへ一言 → 対話でスイッチ保持</div></div></div>
+    <div class="ti"><span class="ttime">20:50</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">21:00</span><div class="tdot"></div><div class="tc"><div class="tt">お風呂＆ケア 30分</div></div></div>
+    <div class="ti"><span class="ttime">21:30</span><div class="tdot amber"></div><div class="tc amber"><div class="tt">勉強 60分 <span class="bdg bdg-amber">コア枠</span></div><div class="ts">haruka nakamura で集中</div></div></div>
+    <div class="ti"><span class="ttime">22:10</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">22:30</span><div class="tdot purple"></div><div class="tc purple"><div class="tt">就寝 <span class="bdg bdg-purple">6時間確保</span></div></div></div>
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床</div></div></div>
+  </div>
+  <div class="rules">
+    <div class="rt">ポイント</div>
+    <div class="ri"><span class="rn">1</span>夕食→即筋トレ。ストレス食いの時間を物理的に消す</div>
+    <div class="ri"><span class="rn">2</span>風呂待ちはClaude対話。グダグダの入口を塞ぐ</div>
+    <div class="ri"><span class="rn">3</span>勉強が乗っても22:30で切る。睡眠は死守</div>
+  </div>
+</div>
+
+<div class="panel" id="panel-fri">
+  <div class="sec-label">朝</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床・朝筋トレ 20分 <span class="bdg bdg-teal">朝</span></div><div class="ts">Pendulum で集中スタート</div></div></div>
+    <div class="ti"><span class="ttime">〜</span><div class="tdot"></div><div class="tc gray"><div class="tt">日中（仕事）</div></div></div>
+  </div>
+  <div class="sec-label">夜</div>
+  <div class="tl">
+    <div class="ti"><span class="ttime">19:30</span><div class="tdot blue"></div><div class="tc blue"><div class="tt">夕食 <span class="bdg bdg-blue">20:00までに完了</span></div></div></div>
+    <div class="ti"><span class="ttime">20:00</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">夜筋トレ 30分 <span class="bdg bdg-teal">夜</span></div><div class="ts">食後すぐ動いてストレス食いの隙間を潰す</div></div></div>
+    <div class="ti"><span class="ttime">20:30</span><div class="tdot"></div><div class="tc"><div class="tt">休息・風呂待ち 約20分</div><div class="ts">Claudeへ一言 → 対話でスイッチ保持</div></div></div>
+    <div class="ti"><span class="ttime">20:50</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">21:00</span><div class="tdot"></div><div class="tc"><div class="tt">お風呂＆ケア 30分</div></div></div>
+    <div class="ti"><span class="ttime">21:30</span><div class="tdot amber"></div><div class="tc amber"><div class="tt">勉強 60分 <span class="bdg bdg-amber">コア枠</span></div><div class="ts">haruka nakamura で集中</div></div></div>
+    <div class="ti"><span class="ttime">22:10</span><div class="tdot blue"></div><div class="water">💧 水 コップ1杯</div></div>
+    <div class="ti"><span class="ttime">22:30</span><div class="tdot purple"></div><div class="tc purple"><div class="tt">就寝 <span class="bdg bdg-purple">6時間確保</span></div></div></div>
+    <div class="ti"><span class="ttime">04:30</span><div class="tdot teal"></div><div class="tc teal"><div class="tt">起床</div></div></div>
+  </div>
+  <div class="rules">
+    <div class="rt">ポイント</div>
+    <div class="ri"><span class="rn">1</span>夕食→即筋トレ。ストレス食いの時間を物理的に消す</div>
+    <div class="ri"><span class="rn">2</span>風呂待ちはClaude対話。グダグダの入口を塞ぐ</div>
+    <div class="ri"><span class="rn">3</span>勉強が乗っても22:30で切る。睡眠は死守</div>
+  </div>
+</div>
+
+<script>
+const days = ['mon','tue','wed','thu','fri'];
+function show(d) {
+  days.forEach(x => {
+    document.getElementById('panel-'+x).className = 'panel' + (x===d ? ' active' : '');
+    document.getElementById('pill-'+x).classList.toggle('active', x===d);
+  });
+}
+</script>
+</body>
+</html>
